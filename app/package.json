@@ -11,8 +11,11 @@
   },
   "scripts": {
     "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
-    "postinstall": "yarn electron-rebuild"
+    "postinstall": "yarn electron-rebuild",
+    "rebuild-sqlite3": "electron-rebuild -f -w sqlite3"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "sqlite3": "^5.0.0"
+  }
 }
