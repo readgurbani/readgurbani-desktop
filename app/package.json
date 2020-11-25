@@ -1,0 +1,18 @@
+{
+  "name": "readgurbani-desktop-app",
+  "productName": "readgurbani-desktop-app",
+  "version": "0.0.1",
+  "description": "A desktop application for reading and searching gurbani",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "Read Gurbani",
+    "email": "readgurbani@gmail.com",
+    "url": "https://github.com/readgurbani/readgurbani-desktop.git"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
