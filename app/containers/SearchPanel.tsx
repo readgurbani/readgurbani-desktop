@@ -8,6 +8,7 @@ class SearchPanel extends Component {
       searchText: '',
       searchResult: [],
       shabadResult: [],
+      minimized: false,
       showSearchTab: true,
       showShabadTab: false,
       shabadRow: {
@@ -69,8 +70,22 @@ class SearchPanel extends Component {
     });
   }
 
+  showShabadTab = () => {
+    this.setState({
+      showSearchTab: false,
+      showShabadTab: true,
+    });
+  }
+
+  toggleSearchPanel = () => {
+    const { minimized } = this.state;
+    this.setState({
+      minimized: ! minimized
+    });
+  }
+
   render() {
-    const { searchResult, shabadResult, showSearchTab, showShabadTab } = this.state;
+    const { searchResult, shabadResult, showSearchTab, showShabadTab, minimized } = this.state;
 
     const searchListItems = searchResult.map((row) => {
       row.gurmukhi = row.gurmukhi.replace(new RegExp("\\.|\;", "g"), '');
@@ -87,104 +102,114 @@ class SearchPanel extends Component {
       </li>
     ));
 
+    const minimizedClass = minimized ? 'd-none' : '';
     const searchTabClass = showSearchTab ? '' : 'd-none';
     const shabadTabClass = showShabadTab ? '' : 'd-none';
 
     return (
-    <div
-      style={{
-        position: "absolute",
-        right: 0,
-        bottom: 0,
-        width: "40%",
-        height: "30%"
-      }}
-      className="card"
-    >
-      <div className="card-header">
-        {
-          showSearchTab &&
-          <div className="row">
-              <div className="col-12">
-                  <input
-                    type="text"
-                    className={`form-control gurbani-akhar-regular`}
-                    name="searchText"
-                    value={this.state.searchText}
-                    onChange={this.searchChange}
-                  />
-                  <a
-                    onClick={this.search}
-                    className="btn btn-primary position-absolute"
-                    style={{top: 8, right: 17, borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}
-                  >
-                    <i className="fas fa-search"></i>
-                  </a>
+      <div>
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            width: "40%",
+            height: "30%"
+          }}
+          className={`card ${minimizedClass}`}
+        >
+          {
+            showSearchTab &&
+            <div className="card-header">
+              <div className="row">
+                  <div className="col-12">
+                      <input
+                        type="text"
+                        className={`form-control gurbani-akhar-regular`}
+                        name="searchText"
+                        value={this.state.searchText}
+                        onChange={this.searchChange}
+                      />
+                      <a
+                        onClick={this.search}
+                        className="btn btn-dark position-absolute"
+                        style={{top: 8, right: 17, borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}
+                      >
+                        <i className="fas fa-search"></i>
+                      </a>
+                  </div>
               </div>
+            </div>
+          }
+          <div
+            className={`card-body mb-3 ${searchTabClass}`}
+            style={{
+              overflowX: "auto",
+            }}
+          >
+            <div className="row">
+              <div className="col-md-12">
+                <ul className="gurbani-akhar-regular list-group">
+                  { searchListItems }
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div
+            className={`card-body mb-3 ${shabadTabClass}`}
+            style={{
+              overflowX: "auto",
+            }}
+          >
+            <div className="row">
+              <div className="col-md-12">
+                <ul className="gurbani-akhar-regular list-group">
+                  { shabadListItems }
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="position-absolute container-fluid bg-light"
+            style={{
+              bottom: 0,
+              fontSize: "20px",
+          }}>
+            <div
+              className="row"
+            >
+              <div className="col-md-12 text-right">
+                <a onClick={this.showSearchTab} className="float-left text-dark">
+                  <i className="fas fa-search"></i>
+                </a>
+                <a onClick={this.showShabadTab} className="float-left text-dark">
+                  <i className="far fa-caret-square-down ml-3"></i>
+                </a>
+                <a onClick={this.toggleSearchPanel} className="float-right text-dark">
+                  <i className="far fa-window-restore ml-3"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {
+          minimized &&
+          <div className="position-absolute"
+            style={{
+              bottom: 0,
+              right: 10,
+              fontSize: "20px",
+            }}
+          >
+            <a onClick={this.toggleSearchPanel} className="ml-3 text-dark">
+              <i class="far fa-window-maximize"></i>
+            </a>
           </div>
         }
       </div>
-      <div
-        className={`card-body mb-3 ${searchTabClass}`}
-        style={{
-          overflowX: "auto",
-        }}
-      >
-        <div className="row">
-          <div className="col-md-12">
-            <ul className="gurbani-akhar-regular list-group">
-              { searchListItems }
-            </ul>
-            <ul className="gurbani-akhar-regular list-group">
-              { shabadListItems }
-            </ul>
-          </div>
-        </div>
-        <div
-          className="row position-absolute"
-          style={{
-            bottom: 0
-          }}
-        >
-          <div className="col-md-12">
-            <a onClick={this.showSearchTab}>
-              <i className="fas fa-search"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        className={`card-body mb-3 ${shabadTabClass}`}
-        style={{
-          overflowX: "auto",
-        }}
-      >
-        <div className="row">
-          <div className="col-md-12">
-            <ul className="gurbani-akhar-regular list-group">
-              { searchListItems }
-            </ul>
-            <ul className="gurbani-akhar-regular list-group">
-              { shabadListItems }
-            </ul>
-          </div>
-        </div>
-        <div
-          className="row position-absolute"
-          style={{
-            bottom: 0
-          }}
-        >
-          <div className="col-md-12">
-            <a onClick={this.showSearchTab}>
-              <i className="fas fa-search"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-    }
+    )
+  }
 }
 
 export default SearchPanel;
