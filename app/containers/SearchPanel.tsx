@@ -62,28 +62,33 @@ class SearchPanel extends Component {
     return gurmukhi.replace(new RegExp("\(\.|\;|\,)", "g"), '');
   }
 
+  showSearchTab = () => {
+    this.setState({
+      showSearchTab: true,
+      showShabadTab: false,
+    });
+  }
+
   render() {
     const { searchResult, shabadResult, showSearchTab, showShabadTab } = this.state;
 
-    let listItems = '';
-    console.log(showSearchTab);
-    console.log(showShabadTab);
-    if (showSearchTab) {
-      listItems = searchResult.map((row) => {
-        row.gurmukhi = row.gurmukhi.replace(new RegExp("\\.|\;", "g"), '');
-        return (
-          <li className="list-group-item border-0" key={row.id}>
-            <a onClick={this.showShabad.bind(this, row.shabad_id, row.id)}>{row.gurmukhi}</a>
-          </li>
-        )
-      })
-    } else {
-      listItems = shabadResult.map((row) => (
+    const searchListItems = searchResult.map((row) => {
+      row.gurmukhi = row.gurmukhi.replace(new RegExp("\\.|\;", "g"), '');
+      return (
         <li className="list-group-item border-0" key={row.id}>
-          <a onClick={this.props.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>
+          <a onClick={this.showShabad.bind(this, row.shabad_id, row.id)}>{row.gurmukhi}</a>
         </li>
-      ))
-    }
+      )
+    });
+
+    const shabadListItems = shabadResult.map((row) => (
+      <li className="list-group-item border-0" key={row.id}>
+        <a onClick={this.props.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>
+      </li>
+    ));
+
+    const searchTabClass = showSearchTab ? '' : 'd-none';
+    const shabadTabClass = showShabadTab ? '' : 'd-none';
 
     return (
     <div
@@ -92,39 +97,88 @@ class SearchPanel extends Component {
         right: 0,
         bottom: 0,
         width: "40%",
-        height: "30%",
-        overflowX: "auto",
+        height: "30%"
       }}
       className="card"
     >
-      <div className="card-body">
-        <div className="row">
-          {
-            showSearchTab &&
-            <div className="col-12">
-
-                <input
-                  type="text"
-                  className={`form-control gurbani-akhar-regular $(showSearchTab ? '' : 'd-none')`}
-                  name="searchText"
-                  value={this.state.searchText}
-                  onChange={this.searchChange}
-                />
-                <a
-                  onClick={this.search}
-                  className="btn btn-primary position-absolute"
-                  style={{top: 15, right: 17, borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}
-                >
-                  <i className="fas fa-search"></i>
-                </a>
-            </div>
-          }
-        </div>
+      <div className="card-header">
+        {
+          showSearchTab &&
+          <div className="row">
+              <div className="col-12">
+                  <input
+                    type="text"
+                    className={`form-control gurbani-akhar-regular`}
+                    name="searchText"
+                    value={this.state.searchText}
+                    onChange={this.searchChange}
+                  />
+                  <a
+                    onClick={this.search}
+                    className="btn btn-primary position-absolute"
+                    style={{top: 8, right: 17, borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}
+                  >
+                    <i className="fas fa-search"></i>
+                  </a>
+              </div>
+          </div>
+        }
+      </div>
+      <div
+        className={`card-body mb-3 ${searchTabClass}`}
+        style={{
+          overflowX: "auto",
+        }}
+      >
         <div className="row">
           <div className="col-md-12">
             <ul className="gurbani-akhar-regular list-group">
-              { listItems }
+              { searchListItems }
             </ul>
+            <ul className="gurbani-akhar-regular list-group">
+              { shabadListItems }
+            </ul>
+          </div>
+        </div>
+        <div
+          className="row position-absolute"
+          style={{
+            bottom: 0
+          }}
+        >
+          <div className="col-md-12">
+            <a onClick={this.showSearchTab}>
+              <i className="fas fa-search"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        className={`card-body mb-3 ${shabadTabClass}`}
+        style={{
+          overflowX: "auto",
+        }}
+      >
+        <div className="row">
+          <div className="col-md-12">
+            <ul className="gurbani-akhar-regular list-group">
+              { searchListItems }
+            </ul>
+            <ul className="gurbani-akhar-regular list-group">
+              { shabadListItems }
+            </ul>
+          </div>
+        </div>
+        <div
+          className="row position-absolute"
+          style={{
+            bottom: 0
+          }}
+        >
+          <div className="col-md-12">
+            <a onClick={this.showSearchTab}>
+              <i className="fas fa-search"></i>
+            </a>
           </div>
         </div>
       </div>
