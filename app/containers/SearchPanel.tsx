@@ -8,7 +8,7 @@ class SearchPanel extends Component {
       searchText: '',
       searchResult: [],
       shabadResult: [],
-      currentShabadRow: 0,
+      currentShabadRow: null,
       minimized: false,
       showSearchTab: true,
       showShabadTab: false,
@@ -52,7 +52,6 @@ class SearchPanel extends Component {
   showShabad = (id, rowId) => {
     let db = new sqlite3.Database('gurbani.db');
     db.all("select * from lines where shabad_id = '" + id + "'", (err, rows) => {
-      this.props.showShabadRow(rowId);
       rows.map((row, index) => {
         if (row.id === rowId) {
           this.setState({
@@ -73,7 +72,7 @@ class SearchPanel extends Component {
   }
 
   removePronousation = (gurmukhi) => {
-    return gurmukhi.replace(new RegExp("\(\.|\;|\,)", "g"), '');
+    return gurmukhi.replace(/[,]|[;]|[.]/g, '');
   }
 
   showSearchTab = () => {
@@ -129,16 +128,35 @@ class SearchPanel extends Component {
       this.setState({
         currentShabadRow: currentShabadRow
       });
-      this.props.showShabadRow(rowId);
+      this.showShabadRow(rowId);
       event.preventDefault();
     }
   }
 
+  showShabadRow = (rowId) => {
+    this.props.showShabadRow(rowId);
+    let element = document.getElementById('row-' + rowId);
+
+    if (element === null) {
+      return;
+    }
+
+    //scroll only when current row is outside of view
+    const gap = 40 * 2;
+    const elementTop = document.getElementById('row-' + rowId).offsetTop + gap;
+    const cardTop = document.getElementById('shabad-card').offsetHeight + document.getElementById('shabad-card').scrollTop;
+    if (elementTop > cardTop) {
+      element.scrollIntoView(true);
+    } else if (document.getElementById('shabad-card').scrollTop > document.getElementById('row-' + rowId).offsetTop) {
+      element.scrollIntoView(true);
+    }
+  }
+
   render() {
-    const { searchResult, shabadResult, showSearchTab, showShabadTab, minimized } = this.state;
+    const { searchResult, shabadResult, showSearchTab, showShabadTab, minimized, currentShabadRow } = this.state;
 
     const searchListItems = searchResult.map((row) => {
-      row.gurmukhi = row.gurmukhi.replace(new RegExp("\\.|\;", "g"), '');
+      row.gurmukhi = this.removePronousation(row.gurmukhi);
       return (
         <li className="list-group-item border-0" key={row.id}>
           <a onClick={this.showShabad.bind(this, row.shabad_id, row.id)}>{row.gurmukhi}</a>
@@ -146,11 +164,19 @@ class SearchPanel extends Component {
       )
     });
 
-    const shabadListItems = shabadResult.map((row) => (
-      <li className="list-group-item border-0" key={row.id}>
-        <a onClick={this.props.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>
-      </li>
-    ));
+    const shabadListItems = shabadResult.map((row, index) => {
+      const selectedClass = index === currentShabadRow ? 'fw-bold' : '';
+      row.gurmukhi = this.removePronousation(row.gurmukhi);
+      return (
+        <li
+          id={`row-${row.id}`}
+          className={`list-group-item border-0 ${selectedClass}`}
+          key={row.id}
+        >
+          <a onClick={this.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>
+        </li>
+      );
+    });
 
     const minimizedClass = minimized ? 'd-none' : '';
     const searchTabClass = showSearchTab ? '' : 'd-none';
@@ -207,6 +233,7 @@ class SearchPanel extends Component {
             </div>
           </div>
           <div
+            id="shabad-card"
             className={`card-body mb-3 ${shabadTabClass}`}
             style={{
               overflowX: "auto",

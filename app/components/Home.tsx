@@ -36,12 +36,16 @@ export default class Home extends Component {
       `,
       (err, rows) => {
         let row = rows[0];
-        row.gurmukhi = row.gurmukhi.replace(new RegExp("\\.|\;", "g"), '');
+        row.gurmukhi = this.removePronousation(row.gurmukhi);
         this.setState({
           shabadRow: row
       });
     });
     db.close();
+  }
+
+  removePronousation = (gurmukhi) => {
+    return gurmukhi.replace(/[,]|[;]|[.]/g, '');
   }
 
   render() {
@@ -55,6 +59,7 @@ export default class Home extends Component {
               marginTop: "3%",
               textAlign: "center",
               fontWeight: "bold",
+              color: "#1e70d1",
             }}
           >
             { shabadRow.gurmukhi }
