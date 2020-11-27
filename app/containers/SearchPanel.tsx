@@ -8,6 +8,7 @@ class SearchPanel extends Component {
       searchText: '',
       searchResult: [],
       shabadResult: [],
+      currentShabadRow: 0,
       minimized: false,
       showSearchTab: true,
       showShabadTab: false,
@@ -15,6 +16,10 @@ class SearchPanel extends Component {
         gurmukhi: '',
       }
     };
+  }
+
+  componentDidMount() {
+    window.addEventListener("keydown", this.navigate);
   }
 
   handleChange = (event) => {
@@ -47,6 +52,14 @@ class SearchPanel extends Component {
   showShabad = (id, rowId) => {
     let db = new sqlite3.Database('gurbani.db');
     db.all("select * from lines where shabad_id = '" + id + "'", (err, rows) => {
+      this.props.showShabadRow(rowId);
+      rows.map((row, index) => {
+        if (row.id === rowId) {
+          this.setState({
+            currentShabadRow: index
+          });
+        }
+      });
       this.setState({
         shabadResult: rows
       });
@@ -82,6 +95,43 @@ class SearchPanel extends Component {
     this.setState({
       minimized: ! minimized
     });
+  }
+
+  navigate = (event) => {
+    const { showShabadTab, shabadResult } = this.state;
+    let { currentShabadRow } = this.state;
+    if (showShabadTab) {
+      switch (event.key) {
+        case "ArrowUp":
+          currentShabadRow--;
+          break;
+
+        case "ArrowDown":
+          currentShabadRow++;
+          break;
+
+        case "ArrowLeft":
+          currentShabadRow--;
+          break;
+
+        case "ArrowRight":
+          currentShabadRow++;
+          break;
+      }
+
+      const currentSerial = currentShabadRow + 1;
+      if (currentSerial === 0 || currentSerial > shabadResult.length) {
+        return;
+      }
+
+      const rowId = shabadResult[currentShabadRow].id;
+
+      this.setState({
+        currentShabadRow: currentShabadRow
+      });
+      this.props.showShabadRow(rowId);
+      event.preventDefault();
+    }
   }
 
   render() {
@@ -146,6 +196,7 @@ class SearchPanel extends Component {
             style={{
               overflowX: "auto",
             }}
+            onKeyDown={this.navigate}
           >
             <div className="row">
               <div className="col-md-12">
