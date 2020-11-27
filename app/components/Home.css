@@ -12,3 +12,10 @@
 .container a {
   font-size: 1.4rem;
 }
+
+.shabad-row-gurmukhi {
+  font-size: 74px;
+  margin-top: 5%;
+  text-align: center;
+  font-weight: bold;
+}
