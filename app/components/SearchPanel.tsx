@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Settings from '../features/settings/Settings';
 var sqlite3 = require('sqlite3').verbose();
 import style from './SearchPanel.css';
 
@@ -16,6 +17,7 @@ class SearchPanel extends Component {
       minimized: false,
       showSearchTab: true,
       showShabadTab: false,
+      showSettingsTab: false,
       shabadRow: {
         gurmukhi: '',
       }
@@ -80,20 +82,6 @@ class SearchPanel extends Component {
 
   removePronousation = (gurmukhi) => {
     return gurmukhi.replace(/[,]|[;]|[.]/g, '');
-  }
-
-  showSearchTab = () => {
-    this.setState({
-      showSearchTab: true,
-      showShabadTab: false,
-    });
-  }
-
-  showShabadTab = () => {
-    this.setState({
-      showSearchTab: false,
-      showShabadTab: true,
-    });
   }
 
   toggleSearchPanel = () => {
@@ -190,6 +178,21 @@ class SearchPanel extends Component {
     }
   }
 
+  getTabsWithDefaultStatus = () => {
+    return {
+      showSearchTab: false,
+      showShabadTab: false,
+      showSettingsTab: false,
+    }
+  }
+
+  showTab = (tabName) => {
+    let tabs = this.getTabsWithDefaultStatus();
+    const tab = 'show' + tabName + 'Tab';
+    tabs[tab] = true;
+    this.setState(tabs);
+  }
+
   render() {
     const {
       searchResult,
@@ -199,6 +202,7 @@ class SearchPanel extends Component {
       minimized,
       currentShabadRow,
       homeShabadRow,
+      showSettingsTab,
     } = this.state;
 
     const searchListItems = searchResult.map((row) => {
@@ -297,6 +301,7 @@ class SearchPanel extends Component {
               </div>
             </div>
           </div>
+          <Settings displayTab={showSettingsTab} />
 
           <div
             className="position-absolute container-fluid bg-light"
@@ -308,10 +313,13 @@ class SearchPanel extends Component {
               className="row"
             >
               <div className="col-md-12 text-right">
-                <a onClick={this.showSearchTab} className="float-left text-dark">
+                <a onClick={this.showTab.bind(this, 'Search')} className="float-left text-dark">
                   <i className="fas fa-search"></i>
                 </a>
-                <a onClick={this.showShabadTab} className="float-left text-dark">
+                <a onClick={this.showTab.bind(this, 'Shabad')} className="float-left text-dark">
+                  <i className="far fa-caret-square-down ml-3"></i>
+                </a>
+                <a onClick={this.showTab.bind(this, 'Settings')} className="float-left text-dark">
                   <i className="far fa-caret-square-down ml-3"></i>
                 </a>
                 <a onClick={this.toggleSearchPanel} className="float-right text-dark">
