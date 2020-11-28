@@ -3,6 +3,8 @@ var sqlite3 = require('sqlite3').verbose();
 import style from './SearchPanel.css';
 
 class SearchPanel extends Component {
+  shabadNotVisitedRows = [];
+
   constructor(props) {
     super(props);
     this.state = {
@@ -60,6 +62,8 @@ class SearchPanel extends Component {
             currentShabadRow: index,
             homeShabadRow: index,
           });
+        } else {
+          this.shabadNotVisitedRows.push(index);
         }
       });
       this.setState({
@@ -100,7 +104,7 @@ class SearchPanel extends Component {
   }
 
   navigate = (event) => {
-    const { showShabadTab, shabadResult } = this.state;
+    const { showShabadTab } = this.state;
     let { currentShabadRow } = this.state;
     if (showShabadTab) {
       switch (event.key) {
@@ -119,21 +123,52 @@ class SearchPanel extends Component {
         case "ArrowRight":
           currentShabadRow++;
           break;
+
+        case " ":
+          this.autoNavigate();
+          return;
       }
 
-      const currentSerial = currentShabadRow + 1;
-      if (currentSerial === 0 || currentSerial > shabadResult.length) {
-        return;
-      }
-
-      const rowId = shabadResult[currentShabadRow].id;
-
-      this.setState({
-        currentShabadRow: currentShabadRow
-      });
-      this.showShabadRow(rowId);
       event.preventDefault();
+      this.showShabadRowByIndex(currentShabadRow, true);
     }
+  }
+
+  autoNavigate = () => {
+    let { currentShabadRow, homeShabadRow, visitedShabadRows } = this.state;
+
+    // navigate to home row
+    if (currentShabadRow !== homeShabadRow || this.shabadNotVisitedRows.length === 0) {
+      this.showShabadRowByIndex(homeShabadRow, false);
+      return;
+    }
+
+    // navigate to next unvisited row
+    let nextShabadRow = this.shabadNotVisitedRows.shift();
+    this.showShabadRowByIndex(nextShabadRow, false);
+  }
+
+  showShabadRowByIndex = (currentShabadRow, shiftVisted) => {
+    const { shabadResult } = this.state;
+    const currentSerial = currentShabadRow + 1;
+    if (currentSerial === 0 || currentSerial > shabadResult.length) {
+      return;
+    }
+
+    // remove current shabad row from the not visited rows
+    if (shiftVisted === true && this.shabadNotVisitedRows.length > 0) {
+      const notVisitedIndex = this.shabadNotVisitedRows.indexOf(currentShabadRow);
+      if (notVisitedIndex > -1) {
+        this.shabadNotVisitedRows.splice(notVisitedIndex, 1);
+      }
+    }
+
+    const rowId = shabadResult[currentShabadRow].id;
+
+    this.setState({
+      currentShabadRow: currentShabadRow
+    });
+    this.showShabadRow(rowId);
   }
 
   showShabadRow = (rowId) => {
@@ -179,13 +214,16 @@ class SearchPanel extends Component {
       const selectedClass = index === currentShabadRow ? 'fw-bold' : '';
       const homeRowClass = index === homeShabadRow ? style.homeRow : '';
       row.gurmukhi = this.removePronousation(row.gurmukhi);
+      const visitedClass = this.shabadNotVisitedRows.indexOf(index) === -1 &&
+        index !== currentShabadRow &&
+        index !== homeShabadRow ? style.rowVisited : '';
       return (
         <li
           id={`row-${row.id}`}
-          className={`list-group-item border-0 ${selectedClass} ${homeRowClass}`}
+          className={`list-group-item border-0 ${selectedClass} ${homeRowClass} ${visitedClass}`}
           key={row.id}
         >
-          <a onClick={this.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>
+          <a onClick={this.showShabadRowByIndex.bind(this, index, true)}>{row.gurmukhi}</a>
         </li>
       );
     });
