@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 var sqlite3 = require('sqlite3').verbose();
+import style from './SearchPanel.css';
 
 class SearchPanel extends Component {
   constructor(props) {
@@ -9,6 +10,7 @@ class SearchPanel extends Component {
       searchResult: [],
       shabadResult: [],
       currentShabadRow: null,
+      homeShabadRow: null,
       minimized: false,
       showSearchTab: true,
       showShabadTab: false,
@@ -55,7 +57,8 @@ class SearchPanel extends Component {
       rows.map((row, index) => {
         if (row.id === rowId) {
           this.setState({
-            currentShabadRow: index
+            currentShabadRow: index,
+            homeShabadRow: index,
           });
         }
       });
@@ -153,7 +156,15 @@ class SearchPanel extends Component {
   }
 
   render() {
-    const { searchResult, shabadResult, showSearchTab, showShabadTab, minimized, currentShabadRow } = this.state;
+    const {
+      searchResult,
+      shabadResult,
+      showSearchTab,
+      showShabadTab,
+      minimized,
+      currentShabadRow,
+      homeShabadRow,
+    } = this.state;
 
     const searchListItems = searchResult.map((row) => {
       row.gurmukhi = this.removePronousation(row.gurmukhi);
@@ -166,11 +177,12 @@ class SearchPanel extends Component {
 
     const shabadListItems = shabadResult.map((row, index) => {
       const selectedClass = index === currentShabadRow ? 'fw-bold' : '';
+      const homeRowClass = index === homeShabadRow ? style.homeRow : '';
       row.gurmukhi = this.removePronousation(row.gurmukhi);
       return (
         <li
           id={`row-${row.id}`}
-          className={`list-group-item border-0 ${selectedClass}`}
+          className={`list-group-item border-0 ${selectedClass} ${homeRowClass}`}
           key={row.id}
         >
           <a onClick={this.showShabadRow.bind(this, row.id)}>{row.gurmukhi}</a>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SearchPanel from '../containers/SearchPanel';
+import SearchPanel from './SearchPanel';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes.json';
 import styles from './Home.css';
