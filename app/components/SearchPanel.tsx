@@ -331,7 +331,7 @@ class SearchPanel extends Component {
             }}
           >
             <a onClick={this.toggleSearchPanel} className="ml-3 text-dark">
-              <i class="far fa-window-maximize"></i>
+              <i className="far fa-window-maximize"></i>
             </a>
           </div>
         }
